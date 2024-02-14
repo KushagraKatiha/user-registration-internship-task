@@ -6,7 +6,15 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
-    confirmPassword: { type: String, required: true, select: false}
+    confirmPassword: { type: String, required: true, select: false},
+    avatar:{
+        public_id:{
+            type: String
+        },
+        secure_url:{
+            type: String
+        }
+    }
 }, {timestamps: true});
 
 // hash function
@@ -27,10 +35,12 @@ userSchema.methods.getSignedToken = function(){
     });
 }
 
+// method to compare password
 userSchema.methods.matchPassword = async function(enteredPassword){
     return await bcrypt.compare(enteredPassword, this.password);
 }
 
+// Prehook
 userSchema.pre('save', async function(next){
     this.hashPassword(next);
 });

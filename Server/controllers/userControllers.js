@@ -133,4 +133,15 @@ const userDetails = async (req, res) => {
     }
 }
 
+// const uploadFile = async (req, res) => {
+//     try{
+        
+//     }catch(err){
+//         res.status(400).json({
+//             message: err.message,
+//             status: false
+//         })
+//     }
+// }
+
 export { signUp, signIn, signOut, deleteUser, updateUser, userDetails }
