@@ -83,12 +83,54 @@ const signOut = async (req, res) => {
         })}
     }
 
-const deleteUser = (req, res) => {
-
+const deleteUser = async (req, res) => {
+    try{
+        let userId = req.user.id;
+        let deletedUser = await User.findByIdAndDelete({_id:userId})
+        res.status(200).json({
+            deletedUser,
+            message: "User deleted successfully",
+        })
+    }catch(error){
+        res.status(400).json({
+            message: error.message
+        })
+    }
 }
 
 const updateUser = (req, res) => {
+    try{
+        let {email, username, name} = req.body
+        let userId = req.user.id;
+        User.findByIdAndUpdate(userId, {email, username, name},{runValidators: true, new: true})
 
+        res.status(200).json({
+            message: "User updated successfully",
+            status: true
+        })
+    }catch(err){
+        res.status(400).json({
+            message: err.message,
+            status: flase
+        })
+    }
 }
 
-export { signUp, signIn, signOut, deleteUser, updateUser }
+const userDetails = async (req, res) => {
+    const userId = req.user.id
+    try{
+        const userDetails = await User.findById({_id: userId});
+        res.status(200).json({
+            message: "User Details Fetched Successfully",
+            success:true,
+            userDetails
+        })
+    }catch(err){
+        res.status(400).json({
+            message: err.message,
+            success: false
+        })
+    }
+}
+
+export { signUp, signIn, signOut, deleteUser, updateUser, userDetails }
