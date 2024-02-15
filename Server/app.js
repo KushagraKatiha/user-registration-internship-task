@@ -16,6 +16,6 @@ app.use(express.json())
 app.use(cookieParser())
 express.urlencoded({extended: true})
 
-app.get('/', Router)
+app.use('/', Router)
 
 export default app

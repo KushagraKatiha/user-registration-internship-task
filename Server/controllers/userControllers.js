@@ -1,8 +1,13 @@
+import uploadOnCloudinary from '../Utils/fileUpload.js';
 import User from '../models/userModel.js';
 
+
 const signUp = async (req, res) => {
-  const { username, email, password, confirmPassword } = req.body;
+    const { username, email, password, confirmPassword } = req.body;
     try {
+        
+        if(!req.file) throw new Error('Please upload an image');
+        console.log(req.file);
         if (password !== confirmPassword) { // Check if password and confirm password match
             throw new Error('Password and Confirm Password do not match');
         }
@@ -18,10 +23,27 @@ const signUp = async (req, res) => {
             throw new Error('User already exists');
         }
 
-        User.save({ username, email, password });  // Save user to database
+        console.log(`File path: ${req.file.path}`);
+
+        const uploadedImage = await uploadOnCloudinary(req.file.path);
+
+        if(!uploadedImage) throw new Error("Error uploading image")
+
+        console.log(uploadedImage);
+
+        const newUser = new User({ // Create a new user instance
+            username,
+            email,
+            password,
+            avatar: {
+                public_id: uploadedImage.public_id,
+                secure_url: uploadedImage.secure_url
+            }
+        });
+
+        await newUser.save();  // Save user to database
 
         res.status(201).json({ message: 'User created successfully' });  // Send success message
-
     } catch (error) {
         res.status(400).json({ message: error.message });  // Send error message
     }
@@ -133,15 +155,5 @@ const userDetails = async (req, res) => {
     }
 }
 
-// const uploadFile = async (req, res) => {
-//     try{
-        
-//     }catch(err){
-//         res.status(400).json({
-//             message: err.message,
-//             status: false
-//         })
-//     }
-// }
 
 export { signUp, signIn, signOut, deleteUser, updateUser, userDetails }

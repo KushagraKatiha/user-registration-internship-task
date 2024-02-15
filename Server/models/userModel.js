@@ -3,16 +3,17 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
+    username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
-    confirmPassword: { type: String, required: true, select: false},
     avatar:{
         public_id:{
-            type: String
+            type: String,
+            default: "dummy_url"
         },
         secure_url:{
-            type: String
+            type: String,
+            default: "dummy_url"
         }
     }
 }, {timestamps: true});
