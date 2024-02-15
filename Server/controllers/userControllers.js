@@ -3,7 +3,7 @@ import User from '../models/userModel.js';
 
 
 const signUp = async (req, res) => {
-    const { username, email, password, confirmPassword } = req.body;
+    const { username,name , email, password, confirmPassword } = req.body;
     try {
         
         if(!req.file) throw new Error('Please upload an image');
@@ -33,6 +33,7 @@ const signUp = async (req, res) => {
 
         const newUser = new User({ // Create a new user instance
             username,
+            name,
             email,
             password,
             avatar: {
@@ -58,27 +59,28 @@ const signIn = async (req, res) => {
         }
 
         const user = await User.findOne({ email }).select('+password');  // Find user by email
-
+        console.log(user);
         if(!user){  // If user does not exist, throw an error
             throw new Error('Invalid email or password');
-        }else{  // If user exists, check if password is correct
+        }// If user exists, check if password is correct
 
             const isMatch = await user.matchPassword(password);  // Check if password is correct
-
+            console.log(password, user.password);
             if(!isMatch){  // If password is incorrect, throw an error
                 throw new Error('Invalid email or password');
-            }else{  // If password is correct, send token
+            }
+            // If password is correct, send token
                 const token = user.getSignedToken();
                 // Set token into cookies
-
+                console.log(token);
                 const cookieOptions = {
-                    expires: 24*60*60*1000,
+                    expires: new Date(Date.now() + 24*60*60*1000),
                     httpOnly: true
                 }
 
                 res.cookie('token', token, cookieOptions);
-            }
-        }
+            
+        
 
         res.status(200).json({
             message: 'User signed in successfully',

@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true },
+    name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
     avatar:{
@@ -23,7 +24,7 @@ userSchema.methods.hashPassword = async function(next){
     if(!this.isModified('password')){
         return next();
     }else{
-        this.password = bcrypt.hash(this.password, 8);
+        this.password = await bcrypt.hash(this.password, 8);
         this.confirmPassword = undefined;
         next();
     }
@@ -43,7 +44,7 @@ userSchema.methods.matchPassword = async function(enteredPassword){
 
 // Prehook
 userSchema.pre('save', async function(next){
-    this.hashPassword(next);
+    await this.hashPassword(next);
 });
 
 const User = mongoose.model('User', userSchema);
